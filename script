@@ -1,0 +1,55 @@
+// Set API endpoint and API key
+const apiEndpoint = "https://maps.googleapis.com/maps/api/geocode/json";
+const apiKey = "YOUR_API_KEY";
+
+// Set map options
+const mapOptions = {
+    center: { lat: 28.5355, lng: 77.3910 },
+    zoom: 18,
+    mapTypeId: google.maps.MapTypeId.ROADMAP
+};
+
+// Create map
+const map = new google.maps.Map(document.getElementById("map"), mapOptions);
+
+// Add markers for locations
+const locations = [
+    { name: "Building A", lat: 28.5355, lng: 77.3910 },
+    { name: "Building B", lat: 28.5360, lng: 77.3920 },
+    { name: "Building C", lat: 28.5370, lng: 77.3930 },
+    { name: "Library", lat: 28.5380, lng: 77.3940 },
+    { name: "Canteen", lat: 28.5390, lng: 77.3950 },
+    { name: "Playground", lat: 28.5400, lng: 77.3960 },
+    { name: "Parking Lot", lat: 28.5410, lng: 77.3970 }
+];
+
+locations.forEach((location) => {
+    const marker = new google.maps.Marker({
+        position: { lat: location.lat, lng: location.lng },
+        map: map,
+        title: location.name
+    });
+});
+
+// Add search functionality
+const searchInput = document.getElementById("search-input");
+const searchButton = document.getElementById("search-button");
+const searchResults = document.getElementById("search-results");
+
+searchButton.addEventListener("click", () => {
+    const searchTerm = searchInput.value.trim();
+    if (searchTerm) {
+        fetch(`${apiEndpoint}?address=${searchTerm}&key=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                const results = data.results;
+                searchResults.innerHTML = "";
+                results.forEach((result) => {
+                    const listItem = document.createElement("li");
+                    listItem.textContent = result.formatted_address;
+                    searchResults.appendChild(listItem);
+                });
+            })
+            .catch(error => console.error(error));
+    }
+});
